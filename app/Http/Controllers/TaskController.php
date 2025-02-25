@@ -3,46 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Task;
+use Illuminate\Support\Facades\Auth;
+use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    // 🟢 掃除当番リスト取得 (GET /tasks)
     public function index()
     {
-        //
+        $tasks = Task::with('user')->get();
+        return Inertia::render('Tasks/Index', ['tasks' => $tasks]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    // 🟢 新しい掃除当番を追加 (POST /tasks)
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'area' => 'required|string|max:255',
+        ]);
+
+        $task = Task::create([
+            'user_id' => Auth::id(), // 現在ログイン中のユーザー
+            'area' => $request->area,
+        ]);
+
+        return response()->json($task, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    // 🟢 掃除当番を更新 (PUT /tasks/{id})
+    public function update(Request $request, Task $task)
     {
-        //
+        // 🔹 他のユーザーのタスクを編集できないように制限
+        if ($task->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $request->validate([
+            'area' => 'required|string|max:255',
+        ]);
+
+        $task->update(['area' => $request->area]);
+
+        return response()->json($task);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    // 🟢 掃除当番を削除 (DELETE /tasks/{id})
+    public function destroy(Task $task)
     {
-        //
-    }
+        // 🔹 他のユーザーのタスクを削除できないように制限
+        if ($task->user_id !== Auth::id()) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $task->delete();
+        return response()->json(['message' => 'Task deleted']);
     }
 }
