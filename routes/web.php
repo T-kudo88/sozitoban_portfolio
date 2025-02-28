@@ -1,23 +1,21 @@
 <?php
 
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\ProfileController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\AuthController;
 
-// 🔹 掃除当番のホーム画面（タスク一覧）を表示
-Route::get('/', [TaskController::class, 'index'])->name('tasks.index');
+// 🔹 フロントエンドの掃除当番管理画面（Vue の Tasks/Index.vue を表示）
+Route::get('/', function () {
+    return Inertia::render('Tasks/Index');
+})->name('tasks.index');
 
-// 🔹 ダッシュボード（ログイン必須）
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+// 🔹 `/tasks` は Vue のページを表示するためのルート
+Route::get('/tasks', function () {
+    return Inertia::render('Tasks/Index');
+})->name('tasks.view');
 
-// 🔹 ユーザープロフィールの管理（ログイン必須）
-Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-});
-
-require __DIR__ . '/auth.php';
+// 🔹 `login` ルートの重複を防ぐため、`GET /login` のみ定義
+Route::get('/login', function () {
+    return Inertia::render('Auth/Login'); // Vue のログインページを表示
+})->name('login');

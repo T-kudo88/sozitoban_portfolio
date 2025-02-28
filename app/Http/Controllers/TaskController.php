@@ -9,14 +9,20 @@ use Inertia\Inertia;
 
 class TaskController extends Controller
 {
-    // 🟢 掃除当番リスト取得 (GET /tasks)
+    // 🟢 Web版 (Vue.js)
     public function index()
     {
         $tasks = Task::with('user')->get();
         return Inertia::render('Tasks/Index', ['tasks' => $tasks]);
     }
 
-    // 🟢 新しい掃除当番を追加 (POST /tasks)
+    // 🟢 API版 (JSON)
+    public function apiIndex()
+    {
+        return response()->json(Task::with('user')->get());
+    }
+
+    // 🟢 新しい掃除当番を追加 (POST /api/tasks)
     public function store(Request $request)
     {
         $request->validate([
@@ -31,10 +37,9 @@ class TaskController extends Controller
         return response()->json($task, 201);
     }
 
-    // 🟢 掃除当番を更新 (PUT /tasks/{id})
+    // 🟢 掃除当番を更新 (PUT /api/tasks/{id})
     public function update(Request $request, Task $task)
     {
-        // 🔹 他のユーザーのタスクを編集できないように制限
         if ($task->user_id !== Auth::id()) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
@@ -48,15 +53,14 @@ class TaskController extends Controller
         return response()->json($task);
     }
 
-    // 🟢 掃除当番を削除 (DELETE /tasks/{id})
+    // 🟢 掃除当番を削除 (DELETE /api/tasks/{id})
     public function destroy(Task $task)
     {
-        // 🔹 他のユーザーのタスクを削除できないように制限
-        if ($task->user_id !== Auth::id()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+        if (!$task) {
+            return response()->json(['message' => 'Task not found'], 404);
         }
 
         $task->delete();
-        return response()->json(['message' => 'Task deleted']);
+        return response()->json(['message' => 'Task deleted'], 200);
     }
 }
