@@ -29,6 +29,11 @@ class TaskController extends Controller
             'area' => 'required|string|max:255',
         ]);
 
+        // 認証済みユーザーのタスクを作成
+        $task = auth()->user()->tasks()->create([
+            'area' => $validated['area'],
+        ]);
+
         $task = Task::create([
             'user_id' => Auth::id(), // 現在ログイン中のユーザー
             'area' => $request->area,

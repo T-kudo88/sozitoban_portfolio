@@ -6,7 +6,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\TaskController;
 
 // 🔹 認証不要のAPIエンドポイント
-Route::post('/login', [AuthController::class, 'login'])->name('api.login'); // `api.login` に変更
+Route::post('/login', [AuthController::class, 'login'])->name('api.login');
 
 // 🔹 Sanctum 認証が必要なエンドポイント
 Route::middleware('auth:sanctum')->group(function () {
@@ -22,7 +22,4 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 });
 
-// 🔹 CSRFトークンを取得するためのエンドポイント
-Route::get('/sanctum/csrf-cookie', function (Request $request) {
-    return response()->json(['message' => 'CSRF token set']);
-});
+// 🛑 🔹 この二重定義は削除！
