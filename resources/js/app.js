@@ -1,27 +1,15 @@
-import '../css/app.css';
-import './bootstrap';
+import { createApp } from 'vue';
+import Table from './components/Table.vue';
+import Form from './components/Form.vue';
+import Button from './components/Button.vue';
+import Timer from './components/Timer.vue';
+import Shuffle from './components/Shuffle.vue';
+import App from './Pages/Tasks/Index.vue';
 
-import { createInertiaApp } from '@inertiajs/vue3';
-import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
-import { createApp, h } from 'vue';
-import { ZiggyVue } from '../../vendor/tightenco/ziggy';
-
-const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
-
-createInertiaApp({
-    title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.vue`,
-            import.meta.glob('./Pages/**/*.vue'),
-        ),
-    setup({ el, App, props, plugin }) {
-        return createApp({ render: () => h(App, props) })
-            .use(plugin)
-            .use(ZiggyVue)
-            .mount(el);
-    },
-    progress: {
-        color: '#4B5563',
-    },
-});
+const app = createApp(App);
+app.component('Table', Table);
+app.component('Form', Form);
+app.component('Button', Button);
+app.component('Timer', Timer);
+app.component('Shuffle', Shuffle);
+app.mount('#app');
