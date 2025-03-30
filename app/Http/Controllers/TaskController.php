@@ -25,18 +25,13 @@ class TaskController extends Controller
     // 🟢 新しい掃除当番を追加 (POST /api/tasks)
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'area' => 'required|string|max:255',
         ]);
 
-        // 認証済みユーザーのタスクを作成
-        $task = auth()->user()->tasks()->create([
-            'area' => $validated['area'],
-        ]);
-
         $task = Task::create([
-            'user_id' => Auth::id(), // 現在ログイン中のユーザー
-            'area' => $request->area,
+            'user_id' => Auth::id(),
+            'area' => $validated['area'],
         ]);
 
         return response()->json($task, 201);

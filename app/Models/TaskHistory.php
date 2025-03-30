@@ -12,8 +12,9 @@ class TaskHistory extends Model
     protected $fillable = [
         'user_id',
         'task_id',
-        'completed_at',
         'remarks',
+        'completed_at',
+        'area',
     ];
 
     public $timestamps = false; // 🔹 これを追加することで `created_at` & `updated_at` を無効化

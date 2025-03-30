@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>履歴画面</h1>
+        <h1>インデックスページ</h1>
     </div>
 </template>
 

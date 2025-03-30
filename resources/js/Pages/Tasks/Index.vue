@@ -6,26 +6,29 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
-import Table from '@/components/Table.vue'; // ✅ コンポーネントを正しくインポート
+import { ref, onMounted } from "vue";
+import apiClient from "@/api"; // ✅ axios を統一管理する
+import Table from "@/components/Table.vue"; // ✅ パスを修正
 
 const tasks = ref([]);
 
 onMounted(async () => {
     try {
-        const response = await axios.get('/api/tasks', {
-            headers: {
-                Authorization: 'Bearer 8|Yf640t0eu0lQF4dTZ6wTBh69zQiNCiOedSBaEavKcc9e45eb', // ← 最新のトークン
-                Accept: 'application/json'
-            },
-            withCredentials: true
-        });
+        // 🔹 認証トークンをセット（ローカルストレージなどから取得）
+        const token = localStorage.getItem("authToken");
+        if (token) {
+            apiClient.defaults.headers["Authorization"] = `Bearer ${token}`;
+        }
 
-        console.log('APIレスポンス:', response.data); // ✅ デバッグ用のログ
+        // 🔹 APIリクエスト
+        const response = await apiClient.get("/tasks");
+        console.log("APIレスポンス:", response.data);
         tasks.value = response.data;
     } catch (error) {
-        console.error('APIエラー:', error);
+        console.error("APIエラー:", error);
+
+        // 🔹 ユーザーにエラーを通知
+        alert("データの取得に失敗しました。");
     }
 });
 </script>
