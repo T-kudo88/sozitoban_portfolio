@@ -17,3 +17,14 @@ Route::get('/login', function () {
 })->name('login');
 
 Route::get('/tasks', [TaskController::class, 'index'])->name('tasks.view');
+
+Route::get('/test', function () {
+    return Inertia::render('Hello');
+});
+
+// web.php
+
+Route::get('/', fn() => Inertia::render('Home'))->name('home');
+Route::get('/register', fn() => Inertia::render('Register'))->name('register');
+Route::get('/edit', fn() => Inertia::render('Edit'))->name('edit');
+Route::get('/history', fn() => Inertia::render('History'))->name('history');
