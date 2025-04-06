@@ -30,7 +30,8 @@ class TaskController extends Controller
         ]);
 
         $task = Task::create([
-            'user_id' => Auth::id(),
+            // 'user_id' => Auth::id(),
+            'user_id' => 1, // 👈 仮のユーザーID
             'area' => $validated['area'],
         ]);
 

@@ -1,34 +1,45 @@
 <template>
-    <div>
-        <h1 class="text-2xl font-bold">掃除当番リスト</h1>
-        <Table :tasks="tasks" />
+    <div class="p-6">
+      <h1 class="text-2xl font-bold mb-4">🧹 掃除当番一覧</h1>
+
+      <table class="min-w-full border">
+        <thead>
+          <tr class="bg-gray-100 text-left">
+            <th class="border px-4 py-2">ID</th>
+            <th class="border px-4 py-2">担当者</th>
+            <th class="border px-4 py-2">掃除エリア</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="task in tasks" :key="task.id">
+            <td class="border px-4 py-2">{{ task.id }}</td>
+            <td class="border px-4 py-2">{{ task.user?.name ?? '不明' }}</td>
+            <td class="border px-4 py-2">{{ task.area }}</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-</template>
+  </template>
 
-<script setup>
-import { ref, onMounted } from "vue";
-import apiClient from "@/api"; // ✅ axios を統一管理する
-import Table from "@/components/Table.vue"; // ✅ パスを修正
+  <script setup>
+  import { ref, onMounted } from 'vue'
+  import axios from 'axios'
 
-const tasks = ref([]);
+  const tasks = ref([])
 
-onMounted(async () => {
+  onMounted(async () => {
     try {
-        // 🔹 認証トークンをセット（ローカルストレージなどから取得）
-        const token = localStorage.getItem("authToken");
-        if (token) {
-            apiClient.defaults.headers["Authorization"] = `Bearer ${token}`;
-        }
-
-        // 🔹 APIリクエスト
-        const response = await apiClient.get("/tasks");
-        console.log("APIレスポンス:", response.data);
-        tasks.value = response.data;
-    } catch (error) {
-        console.error("APIエラー:", error);
-
-        // 🔹 ユーザーにエラーを通知
-        alert("データの取得に失敗しました。");
+      const res = await axios.get('/api/tasks')
+      tasks.value = res.data
+    } catch (err) {
+      console.error('タスク取得エラー:', err)
     }
-});
-</script>
+  })
+  </script>
+
+  <style scoped>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+  </style>

@@ -18,7 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // 🔹 タスク関連エンドポイント
     Route::prefix('/tasks')->group(function () {
-        Route::get('/', [TaskController::class, 'index'])->name('tasks.list');
+        Route::get('/', [TaskController::class, 'apiIndex'])->name('tasks.api.list'); // ←ここを apiIndex に！
         Route::post('/', [TaskController::class, 'store'])->name('tasks.store');
         Route::put('/{task}', [TaskController::class, 'update'])->name('tasks.update');
         Route::delete('/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
