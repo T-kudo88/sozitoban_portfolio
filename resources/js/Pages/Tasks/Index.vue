@@ -21,25 +21,45 @@
     </div>
   </template>
 
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import axios from 'axios'
+<script setup>
+import { ref, onMounted } from 'vue'
+import api from '@/api'
 
-  const tasks = ref([])
+const timer = ref(600) // 10分 = 600秒
+const isRunning = ref(false)
+let interval = null
 
-  onMounted(async () => {
-    try {
-      const res = await axios.get('/api/tasks')
-      tasks.value = res.data
-    } catch (err) {
-      console.error('タスク取得エラー:', err)
+const startTimer = () => {
+  if (isRunning.value) return
+  isRunning.value = true
+  interval = setInterval(() => {
+    if (timer.value > 0) {
+      timer.value--
+    } else {
+      clearInterval(interval)
+      isRunning.value = false
+      alert("🕓 掃除完了です！履歴に記録されます。")
+      submitHistory() // タイマー終了後に履歴登録
     }
-  })
-  </script>
+  }, 1000)
+}
 
-  <style scoped>
-  table {
-    border-collapse: collapse;
-    width: 100%;
+const formatTime = () => {
+  const min = String(Math.floor(timer.value / 60)).padStart(2, '0')
+  const sec = String(timer.value % 60).padStart(2, '0')
+  return `${min}:${sec}`
+}
+
+// 履歴登録（簡易版）
+const submitHistory = async () => {
+  try {
+    await api.client.post('/task-histories', {
+      user_id: 1, // 仮のユーザーID（本番ではログインユーザーのIDを渡す）
+      task_id: 1, // 仮のタスクID（実装済みのシャッフル結果から渡す想定）
+      remarks: '自動登録'
+    })
+  } catch (e) {
+    console.error('履歴登録エラー', e)
   }
-  </style>
+}
+</script>
