@@ -41,4 +41,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return response()->json($request->user());
     })->name('user.profile');
+
+    Route::post('/tasks/shuffle', [TaskController::class, 'shuffleAndAssign'])->name('tasks.shuffle');
 });

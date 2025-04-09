@@ -64,4 +64,22 @@ class TaskController extends Controller
         $task->delete();
         return response()->json(['message' => 'Task deleted'], 200);
     }
+    public function shuffleAndAssign(Request $request)
+    {
+        $users = \App\Models\User::all();
+        $tasks = Task::all();
+
+        if ($users->count() !== $tasks->count()) {
+            return response()->json(['error' => 'ユーザー数とタスク数が一致していません'], 422);
+        }
+
+        $shuffledUsers = $users->shuffle();
+
+        foreach ($tasks as $index => $task) {
+            $task->user_id = $shuffledUsers[$index]->id;
+            $task->save();
+        }
+
+        return response()->json(['message' => 'シャッフル完了', 'tasks' => Task::with('user')->get()]);
+    }
 }
