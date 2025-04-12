@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TaskHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Models\Task;
 
 class TaskHistoryController extends Controller
 {
@@ -14,7 +15,7 @@ class TaskHistoryController extends Controller
     public function index(Request $request)
     {
         $userId = auth()->id();
-        $query = TaskHistory::where('user_id', $userId);
+        $query = TaskHistory::with(['task', 'user'])->where('user_id', $userId);
 
         if ($request->has('area')) {
             $query->where('area', $request->input('area'));
@@ -40,12 +41,13 @@ class TaskHistoryController extends Controller
             'cleaned_at' => 'nullable|date', // 任意で掃除日を指定できるように
         ]);
 
+        $task = Task::findOrFail($validated['task_id']);
+
         $history = TaskHistory::create([
-            'user_id' => auth()->id(), // ←ここを明示的に使う
+            'user_id' => auth()->id(),
             'task_id' => $validated['task_id'],
             'remarks' => $validated['remarks'] ?? null,
             'completed_at' => $validated['cleaned_at'] ?? now(),
-            'area' => $validated['area'],
         ]);
 
         return response()->json($history, 201);

@@ -13,34 +13,32 @@ Route::prefix('/auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->name('api.logout');
 });
 
-// 🔹 認証が必要なエンドポイント
+// 🔐 認証が必要なエンドポイント
 Route::middleware('auth:sanctum')->group(function () {
 
-    // 🔹 タスク関連エンドポイント
+    // タスク系
     Route::prefix('/tasks')->group(function () {
-        Route::get('/', [TaskController::class, 'apiIndex'])->name('tasks.api.list'); // ←ここを apiIndex に！
-        Route::post('/', [TaskController::class, 'store'])->name('tasks.store');
+        Route::get('/', [TaskController::class, 'apiIndex'])->name('tasks.api.list');
+        Route::post('/', [TaskController::class, 'store'])->name('tasks.store'); // ← ここに戻す
         Route::put('/{task}', [TaskController::class, 'update'])->name('tasks.update');
         Route::delete('/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
+        Route::post('/shuffle', [TaskController::class, 'shuffleAndAssign'])->name('tasks.shuffle');
     });
 
-    // 🔹 ユーザー関連エンドポイント（今後の拡張用）
+    // ユーザー系
     Route::prefix('/users')->group(function () {
         Route::get('/', [UserController::class, 'index'])->name('users.list');
         Route::post('/', [UserController::class, 'store'])->name('users.store');
         Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
     });
 
-    // 🔹 清掃履歴関連
+    // 履歴系
     Route::prefix('/task-histories')->group(function () {
         Route::get('/', [TaskHistoryController::class, 'index'])->name('task-histories.index');
         Route::post('/', [TaskHistoryController::class, 'store'])->name('task-histories.store');
     });
 
-    // 🔹 認証済みユーザーの情報取得
     Route::get('/user', function (Request $request) {
         return response()->json($request->user());
     })->name('user.profile');
-
-    Route::post('/tasks/shuffle', [TaskController::class, 'shuffleAndAssign'])->name('tasks.shuffle');
 });
