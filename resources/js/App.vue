@@ -1,9 +1,8 @@
-<!-- resources/js/App.vue -->
-<template>
-    <div id="app">
-        <router-view />
-    </div>
-</template>
-
-<script setup>
+<script setup lang="ts">
+import Timer from './Components/Timer.vue'
 </script>
+
+<template>
+  <h1>🧼 Cleaning App</h1>
+  <Timer />
+</template>

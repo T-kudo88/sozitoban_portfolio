@@ -12,3 +12,7 @@ Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::get('/{any?}', function () {
     return Inertia::render('Home');
 })->where('any', '.*');
+
+Route::get('/timer', function () {
+    return Inertia::render('Timer');
+});
