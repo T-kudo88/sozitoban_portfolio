@@ -5,11 +5,16 @@ use App\Models\User;
 use App\Models\Task;
 use Illuminate\Http\Request;
 use App\Models\TaskHistory;
+use App\Http\Controllers\UserController;
 
 // ✅ 全ユーザー一覧
 Route::get('/users', function () {
     return User::all();
 });
+Route::post('/users', [UserController::class, 'store']);
+
+Route::get('/users', [UserController::class, 'index']);
+Route::post('/users/delete', [UserController::class, 'bulkDelete']);
 
 // ✅ タスク一覧
 Route::get('/tasks', function () {
@@ -38,6 +43,10 @@ Route::post('/task-histories', function (Request $request) {
         'user_id' => 'required|exists:users,id',
         'task_id' => 'required|exists:tasks,id',
     ]);
+
+    Route::get('/task-histories', function () {
+        return TaskHistory::with(['user', 'task'])->latest()->get();
+    });
 
     $history = TaskHistory::create([
         'user_id' => $validated['user_id'],

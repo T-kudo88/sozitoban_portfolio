@@ -10,27 +10,26 @@ class UserController extends Controller
     // 🔹 ユーザー一覧取得
     public function index()
     {
-        return response()->json(User::all());
+        return User::whereNull('deleted_at')->get(); // 論理削除対応
     }
 
     // 🔹 ユーザー登録
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:50',
-            'email' => 'required|email|unique:users,email',
-            'position' => 'nullable|string|max:30',
-            'password' => 'required|string|min:6'
+            'employee_id' => 'required|string|max:30',
+            'name'        => 'required|string|max:50',
+            'email'       => 'required|email|unique:users,email',
+            'position'    => 'required|string|max:50',
         ]);
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'position' => $validated['position'] ?? '未設定',
-            'password' => bcrypt($validated['password'])
+        User::create([
+            'name'        => $validated['name'],
+            'email'       => $validated['email'],
+            'position'    => $validated['position'],
         ]);
 
-        return response()->json($user, 201);
+        return response()->json(['message' => '登録完了'], 201);
     }
 
     // 🔹 ユーザー削除
@@ -38,5 +37,18 @@ class UserController extends Controller
     {
         $user->delete();
         return response()->json(['message' => 'ユーザーを削除しました']);
+    }
+
+
+    public function bulkDelete(Request $request)
+    {
+        $ids = $request->input('ids');
+        if (!is_array($ids)) {
+            return response()->json(['error' => 'Invalid data'], 422);
+        }
+
+        User::whereIn('id', $ids)->update(['deleted_at' => now()]);
+
+        return response()->json(['message' => '削除完了']);
     }
 }
