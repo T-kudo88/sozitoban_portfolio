@@ -9,23 +9,13 @@ class TaskHistory extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'user_id',
-        'task_id',
-        'remarks',
-        'completed_at',
-        'area',
-    ];
+    protected $fillable = ['task_id', 'user_id', 'time_spent'];
 
-    public $timestamps = false; // 🔹 これを追加することで `created_at` & `updated_at` を無効化
-
-    // ユーザーとのリレーション
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // タスクとのリレーション
     public function task()
     {
         return $this->belongsTo(Task::class);

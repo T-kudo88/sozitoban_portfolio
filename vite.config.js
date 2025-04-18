@@ -30,5 +30,8 @@ export default defineConfig({
         host: '127.0.0.1', // ✅ 明示的にローカルホストを指定
         port: 5173, // ✅ Vite のデフォルトポート
         strictPort: true, // ✅ 使用中の場合はエラーを出す（別のポートを使わない）
+        fs: {
+            strict: false
+        }
     },
 });

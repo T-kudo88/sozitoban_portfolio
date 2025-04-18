@@ -1,44 +1,49 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\TaskController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\TaskHistoryController;
+use App\Models\User;
+use App\Models\Task;
+use Illuminate\Http\Request;
+use App\Models\TaskHistory;
 
-// 🔹 認証不要のエンドポイント
-Route::prefix('/auth')->group(function () {
-    Route::post('/login', [AuthController::class, 'login'])->name('api.login');
-    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum')->name('api.logout');
+// ✅ 全ユーザー一覧
+Route::get('/users', function () {
+    return User::all();
 });
 
-// 🔐 認証が必要なエンドポイント
-Route::middleware('auth:sanctum')->group(function () {
+// ✅ タスク一覧
+Route::get('/tasks', function () {
+    return Task::with('user')->get();
+});
 
-    // タスク系
-    Route::prefix('/tasks')->group(function () {
-        Route::get('/', [TaskController::class, 'apiIndex'])->name('tasks.api.list');
-        Route::post('/', [TaskController::class, 'store'])->name('tasks.store'); // ← ここに戻す
-        Route::put('/{task}', [TaskController::class, 'update'])->name('tasks.update');
-        Route::delete('/{task}', [TaskController::class, 'destroy'])->name('tasks.destroy');
-        Route::post('/shuffle', [TaskController::class, 'shuffleAndAssign'])->name('tasks.shuffle');
-    });
+// ✅ タスク作成
+Route::post('/tasks', function (Request $request) {
+    return Task::create($request->all());
+});
 
-    // ユーザー系
-    Route::prefix('/users')->group(function () {
-        Route::get('/', [UserController::class, 'index'])->name('users.list');
-        Route::post('/', [UserController::class, 'store'])->name('users.store');
-        Route::delete('/{user}', [UserController::class, 'destroy'])->name('users.destroy');
-    });
+Route::post('/tasks/shuffle', function () {
+    $tasks = Task::all()->shuffle(); // Laravelコレクションの shuffle()
 
-    // 履歴系
-    Route::prefix('/task-histories')->group(function () {
-        Route::get('/', [TaskHistoryController::class, 'index'])->name('task-histories.index');
-        Route::post('/', [TaskHistoryController::class, 'store'])->name('task-histories.store');
-    });
+    // 各タスクに順番に割り振る（例：担当席を再設定するなど）
+    foreach ($tasks as $index => $task) {
+        $task->seat = '席' . ($index + 1); // 例： 席1、席2...
+        $task->save();
+    }
 
-    Route::get('/user', function (Request $request) {
-        return response()->json($request->user());
-    })->name('user.profile');
+    return response()->json(['message' => 'シャッフル完了']);
+});
+
+Route::post('/task-histories', function (Request $request) {
+    $validated = $request->validate([
+        'user_id' => 'required|exists:users,id',
+        'task_id' => 'required|exists:tasks,id',
+    ]);
+
+    $history = TaskHistory::create([
+        'user_id' => $validated['user_id'],
+        'task_id' => $validated['task_id'],
+        'completed_at' => now(),
+    ]);
+
+    return response()->json($history);
 });

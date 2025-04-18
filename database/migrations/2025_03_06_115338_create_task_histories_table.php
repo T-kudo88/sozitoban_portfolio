@@ -13,12 +13,9 @@ return new class extends Migration
     {
         Schema::create('task_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('task_id')->constrained('tasks')->onDelete('cascade');
-            $table->timestamp('completed_at')->useCurrent();
-            $table->text('remarks')->nullable();
-            $table->string('area');
-            $table->timestamp('cleaned_at')->nullable();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->foreignId('task_id')->constrained()->onDelete('cascade');
+            $table->timestamps(); // ←これが必要！！
         });
     }
 

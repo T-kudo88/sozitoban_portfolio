@@ -35,18 +35,17 @@ class TaskHistoryController extends Controller
         ]);
 
         $validated = $request->validate([
-            'task_id' => 'required|exists:tasks,id',
-            'remarks' => 'nullable|string|max:255',
-            'area' => 'required|string|max:255',
-            'cleaned_at' => 'nullable|date', // 任意で掃除日を指定できるように
+            'task_id'     => 'required|exists:tasks,id',
+            'remarks'     => 'nullable|string|max:255',
+            'area'        => 'required|string|max:255',
+            'cleaned_at'  => 'nullable|date',
         ]);
 
-        $task = Task::findOrFail($validated['task_id']);
-
         $history = TaskHistory::create([
-            'user_id' => auth()->id(),
-            'task_id' => $validated['task_id'],
-            'remarks' => $validated['remarks'] ?? null,
+            'user_id'      => auth()->id(),
+            'task_id'      => $validated['task_id'],
+            'area'         => $validated['area'], // 🔹 追加
+            'remarks'      => $validated['remarks'] ?? null,
             'completed_at' => $validated['cleaned_at'] ?? now(),
         ]);
 
