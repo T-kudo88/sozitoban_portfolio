@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\AuthController;
+use App\Services\SlackNotifier;
 
 // 個別ルートは先に書く！
 Route::get('/timer', function () {
@@ -19,3 +20,8 @@ Route::get('/{any}', function () {
 
 // Laravel 側ではすべて app.blade.php を返す（SPAエントリ）
 Route::view('/{any}', 'app')->where('any', '.*');
+
+Route::get('/test-slack', function () {
+    SlackNotifier::send('✅ Slack通知テスト：掃除当番アプリから送信されました！');
+    return '通知送信しました！';
+});
