@@ -1,9 +1,19 @@
 <template>
-    <div class="p-10 max-w-5xl mx-auto text-center">
-      <h1 class="text-3xl font-bold mb-6">ホーム画面</h1>
+    <div class="p-10 max-w-6xl mx-auto text-center">
+      <h1 class="text-4xl font-bold mb-6">ホーム画面</h1>
+
+      <!-- ✅ 登録・編集ボタン -->
+      <div class="flex justify-end space-x-4 mb-4">
+        <router-link to="/register">
+          <button class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">登録</button>
+        </router-link>
+        <router-link to="/edit">
+          <button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">編集</button>
+        </router-link>
+      </div>
 
       <!-- 🧼 表：タスク一覧 -->
-      <table class="mx-auto border border-collapse w-full max-w-4xl mb-6">
+      <table class="table-auto w-full border border-collapse mb-6">
         <thead class="bg-gray-200">
           <tr>
             <th class="border px-4 py-2">担当者</th>
@@ -22,108 +32,97 @@
         </tbody>
       </table>
 
-      <!-- Home.vue のテンプレート内のどこかに追加（例：シャッフルボタンの下） -->
-<router-link to="/history">
-  <button class="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">
-    履歴を見る
-  </button>
-</router-link>
-
-      <!-- 🔵 シャッフル -->
-      <div class="mb-4">
+      <!-- 🔘 シャッフル・履歴 -->
+      <div class="flex justify-center space-x-4 mb-6">
         <button @click="shuffleTasks"
-          class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-          シャッフル
-        </button>
+          class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">シャッフル</button>
+        <router-link to="/history">
+          <button class="bg-pink-500 text-white px-6 py-2 rounded hover:bg-pink-600">履歴</button>
+        </router-link>
       </div>
 
       <!-- ⏲ タイマー表示 -->
-      <div class="text-6xl font-mono border-2 border-black rounded w-fit mx-auto px-6 py-2 my-4">
+      <div class="text-6xl font-mono border-2 border-black rounded w-fit mx-auto px-10 py-4 mb-6">
         {{ formatTime }}
       </div>
 
       <!-- 🟠 スタート -->
-      <div class="mb-4">
+      <div>
         <button @click="startTask"
           :disabled="isRunning"
-          class="bg-orange-500 text-white px-6 py-2 rounded hover:bg-orange-600 disabled:opacity-50">
+          class="bg-orange-500 text-white text-lg px-8 py-3 rounded hover:bg-orange-600 disabled:opacity-50">
           スタート
         </button>
       </div>
     </div>
   </template>
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue'
+import { fetchTasks, shuffleTasks as callShuffleAPI, createTaskHistory } from '@/api'
 
-  <script setup lang="ts">
-  import { ref, onMounted, computed } from 'vue'
-  import { fetchTasks, shuffleTasks as callShuffleAPI, createTaskHistory } from '@/api'
+const tasks = ref([])
+const getTasks = async () => {
+  const res = await fetchTasks()
+  tasks.value = res.data
+}
 
-  // 🧹 タスク一覧
-  const tasks = ref([])
+// タイマー
+const timer = ref(600)
+const isRunning = ref(false)
+let intervalId: ReturnType<typeof setInterval> | null = null
 
-  const getTasks = async () => {
-    const res = await fetchTasks()
-    tasks.value = res.data
-  }
+const formatTime = computed(() => {
+  const min = String(Math.floor(timer.value / 60)).padStart(2, '0')
+  const sec = String(timer.value % 60).padStart(2, '0')
+  return `${min}:${sec}`
+})
 
-  // ⏱ タイマー関連
-  const timer = ref(600) // 10分 = 600秒
-  const isRunning = ref(false)
-  let intervalId: ReturnType<typeof setInterval> | null = null
+const startTimer = () => {
+  if (isRunning.value) return
+  isRunning.value = true
+  timer.value = 600
 
-  const formatTime = computed(() => {
-    const min = String(Math.floor(timer.value / 60)).padStart(2, '0')
-    const sec = String(timer.value % 60).padStart(2, '0')
-    return `${min}:${sec}`
-  })
-
-  const startTimer = () => {
-    if (isRunning.value) return
-    isRunning.value = true
-    timer.value = 600 // 毎回リセット
-
-    intervalId = setInterval(() => {
-      if (timer.value > 0) {
-        timer.value--
-      } else {
-        clearInterval(intervalId!)
-        isRunning.value = false
-        alert('タイマー終了！')
-      }
-    }, 1000)
-  }
-
-  // 📋 スタート処理＋履歴作成
-  const startTask = async () => {
-    const task = tasks.value[Math.floor(Math.random() * tasks.value.length)]
-    if (!task || !task.user?.id) {
-      alert('対象のタスクが見つかりませんでした')
-      return
+  intervalId = setInterval(() => {
+    if (timer.value > 0) {
+      timer.value--
+    } else {
+      clearInterval(intervalId!)
+      isRunning.value = false
+      alert('タイマー終了！')
     }
+  }, 1000)
+}
 
-    try {
-      await createTaskHistory({
-        user_id: task.user.id,
-        task_id: task.id,
-      })
-      startTimer()
-      alert('履歴に記録しました！タイマー開始！')
-    } catch (e) {
-      console.error(e)
-      alert('記録に失敗しました')
-    }
+const startTask = async () => {
+  const task = tasks.value[Math.floor(Math.random() * tasks.value.length)]
+  if (!task || !task.user?.id) {
+    alert('対象のタスクが見つかりませんでした')
+    return
   }
 
-  // 🔄 シャッフル処理
-  const shuffleTasks = async () => {
-    try {
-      await callShuffleAPI()
-      await getTasks()
-    } catch (error) {
-      console.error('シャッフル失敗:', error)
-    }
+  try {
+    await createTaskHistory({
+      user_id: task.user.id,
+      task_id: task.id,
+    })
+    startTimer()
+    alert('履歴に記録しました！タイマー開始！')
+  } catch (e) {
+    console.error(e)
+    alert('記録に失敗しました')
   }
+}
 
-  onMounted(() => {
-    getTasks()
-  })
-  </script>
+const shuffleTasks = async () => {
+  try {
+    await callShuffleAPI()
+    await getTasks()
+  } catch (error) {
+    console.error('シャッフル失敗:', error)
+  }
+}
+
+onMounted(() => {
+  getTasks()
+})
+</script>

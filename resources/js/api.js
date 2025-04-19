@@ -27,4 +27,9 @@ const apiClient = axios.create({
     withCredentials: true,
 })
 
+// ...既存の export 文の下に追加
+export const deleteUsers = (ids) => {
+    return axios.post('http://localhost:8000/api/users/delete', { ids })
+}
+
 export default apiClient

@@ -27,6 +27,17 @@
           <p v-if="errors.position" class="text-red-500">{{ errors.position }}</p>
         </div>
 
+        <div class="mb-3">
+            <label for="password">パスワード</label>
+            <input
+                id="password"
+                type="password"
+                v-model="form.password"
+                class="border w-full p-2"
+            />
+            <p v-if="errors.password" class="text-red-500">{{ errors.password }}</p>
+        </div>
+
         <div class="flex gap-3 mt-5">
           <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">登録</button>
           <button @click="goBack" type="button" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">戻る</button>
@@ -46,6 +57,7 @@
     name: '',
     email: '',
     position: '',
+    password: '',
   })
   const errors = ref<{ [key: string]: string }>({})
 

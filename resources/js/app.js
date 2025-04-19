@@ -1,6 +1,11 @@
-// resources/js/app.js
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
-createApp(App).use(router).mount('#app')
+const app = createApp(App)
+
+// ✅ 必要な場合のみ Vue Devtools を有効にする（オプション）
+app.config.devtools = true
+
+app.use(router)
+app.mount('#app')

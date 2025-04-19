@@ -21,12 +21,15 @@ class UserController extends Controller
             'name'        => 'required|string|max:50',
             'email'       => 'required|email|unique:users,email',
             'position'    => 'required|string|max:50',
+            'password'    => 'required|string|min:6', //
         ]);
 
         User::create([
+            'employee_id' => $validated['employee_id'], // ← これを追加
             'name'        => $validated['name'],
             'email'       => $validated['email'],
             'position'    => $validated['position'],
+            'password'    => bcrypt($validated['password']), // ← bcrypt 忘れずに！
         ]);
 
         return response()->json(['message' => '登録完了'], 201);
