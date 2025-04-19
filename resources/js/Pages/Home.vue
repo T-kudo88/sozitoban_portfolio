@@ -22,6 +22,13 @@
         </tbody>
       </table>
 
+      <!-- Home.vue のテンプレート内のどこかに追加（例：シャッフルボタンの下） -->
+<router-link to="/history">
+  <button class="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600">
+    履歴を見る
+  </button>
+</router-link>
+
       <!-- 🔵 シャッフル -->
       <div class="mb-4">
         <button @click="shuffleTasks"

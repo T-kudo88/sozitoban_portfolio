@@ -13,7 +13,9 @@ Route::get('/users/edit', fn() => Inertia::render('EditUser'))->name('users.edit
 Route::get('/register', fn() => Inertia::render('Register'))->name('register');
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-// 最後にワイルドカード
-Route::get('/{any?}', function () {
-    return Inertia::render('Home');
+Route::get('/{any}', function () {
+    return view('app'); // resources/views/app.blade.php を返す（SPAのエントリ）
 })->where('any', '.*');
+
+// Laravel 側ではすべて app.blade.php を返す（SPAエントリ）
+Route::view('/{any}', 'app')->where('any', '.*');

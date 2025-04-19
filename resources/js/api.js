@@ -13,6 +13,14 @@ export const createTaskHistory = (data) => {
     return axios.post('http://localhost:8000/api/task-histories', data)
 }
 
+export const fetchTaskHistories = () => {
+    return axios.get('http://localhost:8000/api/task-histories')
+}
+
+export const fetchUsers = () => {
+    return axios.get('http://localhost:8000/api/users')
+}
+
 // ↓ Register.vueで使ってる default export もつける！
 const apiClient = axios.create({
     baseURL: 'http://localhost:8000/api',
