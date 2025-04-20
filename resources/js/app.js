@@ -1,10 +1,11 @@
+import './bootstrap'; // もし使っていれば
+import '../css/app.css'; // ✅ Tailwind CSS 読み込み ←これを追加
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
 
-// ✅ 必要な場合のみ Vue Devtools を有効にする（オプション）
 app.config.devtools = true
 
 app.use(router)

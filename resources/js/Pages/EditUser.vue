@@ -1,76 +1,82 @@
 <template>
-    <div class="p-10 max-w-6xl mx-auto text-center">
-      <h1 class="text-4xl font-bold mb-8">編集画面</h1>
+    <div class="min-h-screen flex flex-col items-center py-10 bg-white">
+      <!-- タイトル -->
+      <h1 class="text-3xl font-bold border px-10 py-2 mb-6">編集画面</h1>
 
-      <div class="overflow-x-auto">
-        <form @submit.prevent="deleteSelectedUsers">
-          <table class="table-auto min-w-full border border-collapse mb-6 text-sm">
-            <thead class="bg-gray-200">
-              <tr>
-                <th class="border px-2 py-2 w-12 text-center">✔</th>
-                <th class="border px-4 py-2 text-left">社員番号</th>
-                <th class="border px-4 py-2 text-left">社員名</th>
-                <th class="border px-4 py-2 text-left">メールアドレス</th>
-                <th class="border px-4 py-2 text-left">役職</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="user in users" :key="user.id" class="hover:bg-gray-50">
-                <td class="border px-2 py-2 text-center">
-                  <input type="checkbox" v-model="selected" :value="user.id" />
-                </td>
-                <td class="border px-4 py-2">{{ user.id }}</td>
-                <td class="border px-4 py-2">{{ user.name }}</td>
-                <td class="border px-4 py-2">{{ user.email }}</td>
-                <td class="border px-4 py-2">{{ user.position }}</td>
-              </tr>
-            </tbody>
-          </table>
+      <!-- 表の枠 -->
+      <div class="border border-black w-[900px] p-6 bg-white">
+        <!-- 表 -->
+        <table class="table-fixed w-full border border-collapse text-center mb-6">
+          <thead class="bg-gray-100">
+            <tr>
+              <th class="border px-2 py-2 w-12"></th>
+              <th class="border px-4 py-2">社員番号</th>
+              <th class="border px-4 py-2">社員名</th>
+              <th class="border px-4 py-2">メールアドレス</th>
+              <th class="border px-4 py-2">役職</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="user in users" :key="user.id">
+              <td class="border px-2 py-2">
+                <input type="checkbox" v-model="selected" :value="user.id" />
+              </td>
+              <td class="border px-4 py-2">{{ user.employee_id }}</td>
+              <td class="border px-4 py-2">{{ user.name }}</td>
+              <td class="border px-4 py-2">{{ user.email }}</td>
+              <td class="border px-4 py-2">{{ user.position }}</td>
+            </tr>
+          </tbody>
+        </table>
 
-          <div class="flex justify-center gap-4">
-            <button
-              type="submit"
-              class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600 transition"
-            >
-              削除
-            </button>
-            <router-link to="/">
-              <button
-                type="button"
-                class="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500 transition"
-              >
-                戻る
-              </button>
-            </router-link>
-          </div>
-        </form>
+        <!-- ボタン -->
+        <div class="flex justify-between">
+          <button @click="deleteUsers" class="bg-red-400 text-white px-6 py-2 rounded hover:bg-red-500">削除</button>
+          <button @click="goBack" class="bg-sky-400 text-white px-6 py-2 rounded hover:bg-sky-500">戻る</button>
+        </div>
       </div>
     </div>
   </template>
 
   <script setup lang="ts">
   import { ref, onMounted } from 'vue'
-  import { fetchUsers, deleteUsers } from '@/api' // 適宜ルート修正
+  import axios from 'axios'
+  import { useRouter } from 'vue-router'
 
   const users = ref([])
   const selected = ref<number[]>([])
+  const router = useRouter()
 
+  // ユーザー一覧取得
   const getUsers = async () => {
-    const res = await fetchUsers()
+    const res = await axios.get('/api/users')
     users.value = res.data
   }
 
-  const deleteSelectedUsers = async () => {
+  // 削除処理
+  const deleteUsers = async () => {
+    if (selected.value.length === 0) {
+      alert('削除するユーザーを選択してください')
+      return
+    }
+
     if (!confirm('本当に削除しますか？')) return
+
     try {
-      await deleteUsers(selected.value)
+      await axios.post('/api/users/bulk-delete', {
+        ids: selected.value,
+      })
+      alert('削除しました！')
       await getUsers()
       selected.value = []
-      alert('削除しました！')
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
       alert('削除に失敗しました')
+      console.error(error)
     }
+  }
+
+  const goBack = () => {
+    router.push('/')
   }
 
   onMounted(() => {

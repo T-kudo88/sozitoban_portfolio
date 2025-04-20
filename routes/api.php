@@ -6,6 +6,7 @@ use App\Models\User;
 use App\Models\Task;
 use App\Models\TaskHistory;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\TaskHistoryController;
 
 // ✅ ユーザー関連
 Route::get('/users', [UserController::class, 'index']);
@@ -47,6 +48,9 @@ Route::post('/task-histories', function (Request $request) {
         'task_id' => $validated['task_id'],
         'completed_at' => now(),
     ]);
+
+    Route::get('/task-histories', [TaskHistoryController::class, 'index']);
+    Route::post('/task-histories', [TaskHistoryController::class, 'store']);
 
     return response()->json($history);
 });
