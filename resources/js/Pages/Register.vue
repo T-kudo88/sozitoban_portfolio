@@ -37,6 +37,17 @@
             <p v-if="errors.position" class="text-red-500 text-sm mt-1">{{ errors.position }}</p>
           </div>
 
+          <!-- 追加するパスワード欄 -->
+<div class="mb-4">
+  <label class="block mb-1 font-bold">パスワード</label>
+  <input
+    type="password"
+    v-model="form.password"
+    class="w-full px-3 py-2 border border-gray-300 rounded"
+    placeholder="パスワードを入力してください"
+  />
+</div>
+
           <!-- ボタンエリア -->
           <div class="flex justify-between mt-8">
             <button type="submit" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">登録</button>
@@ -59,7 +70,7 @@
     name: '',
     email: '',
     position: '',
-    password: 'defaultpass123', // ✅ 今は仮にデフォルトで入れる
+    password: '',
   })
 
   const errors = ref<{ [key: string]: string[] }>({})

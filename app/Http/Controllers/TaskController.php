@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Task;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
@@ -81,5 +82,18 @@ class TaskController extends Controller
         }
 
         return response()->json(['message' => 'シャッフル完了', 'tasks' => Task::with('user')->get()]);
+    }
+    public function shuffle()
+    {
+        try {
+            $result = Task::shuffleAndAssign();
+            return response()->json($result);
+        } catch (\Throwable $e) {
+            Log::error('シャッフル処理失敗: ' . $e->getMessage());
+            return response()->json([
+                'message' => 'エラーが発生しました',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

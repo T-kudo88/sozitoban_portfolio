@@ -63,9 +63,9 @@
     if (!confirm('本当に削除しますか？')) return
 
     try {
-      await axios.post('/api/users/bulk-delete', {
-        ids: selected.value,
-      })
+        await axios.post('/api/users/delete', {
+            ids: selected.value
+        })
       alert('削除しました！')
       await getUsers()
       selected.value = []

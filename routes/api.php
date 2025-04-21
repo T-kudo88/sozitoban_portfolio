@@ -1,12 +1,14 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\Task;
 use App\Models\TaskHistory;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TaskHistoryController;
+use App\Http\Controllers\TaskController;
 
 // ✅ ユーザー関連
 Route::get('/users', [UserController::class, 'index']);
@@ -22,15 +24,8 @@ Route::post('/tasks', function (Request $request) {
     return Task::create($request->all());
 });
 
-Route::post('/tasks/shuffle', function () {
-    $tasks = Task::all()->shuffle();
-    foreach ($tasks as $index => $task) {
-        $task->seat = '席' . ($index + 1);
-        $task->save();
-    }
-    return response()->json(['message' => 'シャッフル完了']);
-});
 
+Route::post('/tasks/shuffle', [TaskController::class, 'shuffle']);
 // ✅ タスク履歴取得（これが必要！）
 Route::get('/task-histories', function () {
     return TaskHistory::with(['user', 'task'])->orderBy('created_at', 'desc')->get();

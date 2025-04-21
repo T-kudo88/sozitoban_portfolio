@@ -27,13 +27,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="letter in ['A','B','C','D','E','F','G']" :key="letter">
-              <td class="border px-4 py-2">{{ letter }}</td>
-              <td class="border px-4 py-2">-</td>
-              <td class="border px-4 py-2">-</td>
-              <td class="border px-4 py-2">-</td>
-            </tr>
-          </tbody>
+  <tr v-for="task in tasks" :key="task.id">
+    <td class="border px-4 py-2">{{ task.user?.name || '-' }}</td>
+    <td class="border px-4 py-2">{{ task.seat || '-' }}</td>
+    <td class="border px-4 py-2">{{ task.method || '-' }}</td>
+    <td class="border px-4 py-2">{{ task.tool || '-' }}</td>
+  </tr>
+</tbody>
         </table>
 
         <!-- ✅ 表の右下：シャッフル・履歴ボタン -->
@@ -62,7 +62,8 @@
 
   <script setup lang="ts">
   import { ref, onMounted, computed } from 'vue'
-  import { fetchTasks, shuffleTasks as callShuffleAPI, createTaskHistory } from '@/api'
+  import { fetchTasks, shuffleTasks as callShuffleAPI } from '@/api/tasks'
+　import { createTaskHistory } from '@/api/history'
 
   const tasks = ref([])
 
