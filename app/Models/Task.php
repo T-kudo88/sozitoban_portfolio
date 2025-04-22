@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
-use Illuminate\Support\Collection;
 
 class Task extends Model
 {
@@ -24,36 +23,7 @@ class Task extends Model
         return $this->belongsTo(User::class);
     }
 
-    public static function shuffleAndAssignTasks()
-    {
-        $users = \App\Models\User::whereNull('deleted_at')->orderBy('id')->get();
-
-        $cleaningSets = [
-            ['seat' => '1Fトイレ', 'method' => 'モップがけ', 'tool' => 'モップ'],
-            ['seat' => '2F給湯室', 'method' => '拭き掃除', 'tool' => '雑巾'],
-            // ...必要な掃除セットを追加
-        ];
-
-        // tasks テーブルを空に
-        self::query()->delete();
-
-        // 掃除セットをシャッフル
-        $shuffledSets = collect($cleaningSets)->shuffle();
-
-        foreach ($users as $i => $user) {
-            if (!isset($shuffledSets[$i])) break;
-
-            self::create([
-                'user_id' => $user->id,
-                'seat'    => $shuffledSets[$i]['seat'],
-                'method'  => $shuffledSets[$i]['method'],
-                'tool'    => $shuffledSets[$i]['tool'],
-            ]);
-        }
-
-        return true;
-    }
-    public static function shuffleAndAssign(): array
+    public static function shuffleAndAssign()
     {
         try {
             $users = User::whereNull('deleted_at')->orderBy('id')->get();
@@ -61,21 +31,21 @@ class Task extends Model
             $cleaningSets = [
                 ['seat' => '1Fトイレ', 'method' => 'モップがけ', 'tool' => 'モップ'],
                 ['seat' => '2F給湯室', 'method' => '拭き掃除', 'tool' => '雑巾'],
-                // ... 残りの掃除セットも省略せずに記載
+                ['seat' => '会議室A', 'method' => '掃き掃除', 'tool' => 'ほうき'],
+                ['seat' => '会議室B', 'method' => '掃き掃除', 'tool' => 'ほうき'],
                 ['seat' => '休憩室', 'method' => 'モップがけ', 'tool' => 'モップ'],
             ];
 
-            self::query()->delete(); // 既存削除
-            $shuffledSets = collect($cleaningSets)->shuffle();
+            self::query()->delete();
 
-            foreach ($users as $i => $user) {
-                if (!isset($shuffledSets[$i])) break;
+            foreach ($users as $user) {
+                $randomSet = $cleaningSets[array_rand($cleaningSets)];
 
                 self::create([
                     'user_id' => $user->id,
-                    'seat'    => $shuffledSets[$i]['seat'],
-                    'method'  => $shuffledSets[$i]['method'],
-                    'tool'    => $shuffledSets[$i]['tool'],
+                    'seat'    => $randomSet['seat'],
+                    'method'  => $randomSet['method'],
+                    'tool'    => $randomSet['tool'],
                 ]);
             }
 

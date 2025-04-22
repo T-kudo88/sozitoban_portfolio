@@ -16,8 +16,26 @@ Route::post('/users', [UserController::class, 'store']);
 Route::post('/users/delete', [UserController::class, 'bulkDelete']);
 
 // ✅ タスク関連
+// routes/api.php
+
 Route::get('/tasks', function () {
-    return Task::with('user')->get();
+    $users = \App\Models\User::whereNull('deleted_at')->orderBy('id')->get();
+    $tasks = \App\Models\Task::all()->groupBy('user_id');
+
+    $result = $users->map(function ($user) use ($tasks) {
+        $taskList = $tasks->get($user->id);
+
+        $task = $taskList?->first();
+
+        return [
+            'user' => $user,
+            'seat' => $task->seat ?? '',
+            'method' => $task->method ?? '',
+            'tool' => $task->tool ?? '',
+        ];
+    });
+
+    return response()->json($result);
 });
 
 Route::post('/tasks', function (Request $request) {

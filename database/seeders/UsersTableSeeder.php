@@ -11,16 +11,13 @@ class UsersTableSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
-        DB::table('users')->insert([
-            [
-                'name' => 'Test User',
-                'email' => 'test@example.com',
-                'password' => Hash::make('password'), // 適当なパスワードを設定
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]
+        \App\Models\User::create([
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'password' => bcrypt('password'),
+            'employee_id' => '0001', // ← ここを追加
         ]);
     }
 }
